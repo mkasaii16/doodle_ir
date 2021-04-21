@@ -25,6 +25,9 @@ dependencies:
     sdk: flutter
   flutter_custom_clippers: ^1.1.2
   animated_drawer: ^0.0.4
+  fab_circular_menu: ^1.0.2
+  dio: ^4.0.0
+  loading_indicator: ^2.0.1
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -34,6 +37,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  scaled_list: ^1.0.1+6
+  pull_to_refresh: ^1.6.5
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

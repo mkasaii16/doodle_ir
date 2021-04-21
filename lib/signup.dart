@@ -1,6 +1,15 @@
+import 'dart:async';
+import 'dart:ui';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
+import 'login.dart';
 
+String name, username, email, password;
+Map error;
+var errorlist;
+int flagsignup;
 void main() {
   runApp(Signup());
 }
@@ -44,6 +53,9 @@ class _SignupState extends State<Signup> {
                             Container(
                                 width: 250.0,
                                 child: TextField(
+                                    onChanged: (text) {
+                                      name = text;
+                                    },
                                     decoration: InputDecoration(
                                         labelText: 'Full Name',
                                         hintText: "Full Name",
@@ -52,6 +64,20 @@ class _SignupState extends State<Signup> {
                             Container(
                                 width: 250.0,
                                 child: TextField(
+                                    onChanged: (text) {
+                                      username = text;
+                                    },
+                                    decoration: InputDecoration(
+                                        labelText: 'User Name',
+                                        hintText: "User Name",
+                                        border: OutlineInputBorder()))),
+                            Spacer(flex: 1),
+                            Container(
+                                width: 250.0,
+                                child: TextField(
+                                    onChanged: (text) {
+                                      email = text;
+                                    },
                                     decoration: InputDecoration(
                                         labelText: 'Email',
                                         hintText: "abc@def.ghi",
@@ -60,6 +86,9 @@ class _SignupState extends State<Signup> {
                             Container(
                                 width: 250.0,
                                 child: TextField(
+                                    onChanged: (text) {
+                                      password = text;
+                                    },
                                     obscureText: true,
                                     autocorrect: false,
                                     decoration: InputDecoration(
@@ -68,7 +97,53 @@ class _SignupState extends State<Signup> {
                                         border: OutlineInputBorder()))),
                             Spacer(flex: 2),
                             ElevatedButton.icon(
-                              onPressed: () {},
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) =>
+                                      _buildPopupDialogloading(context),
+                                );
+                                signup();
+                                Timer(const Duration(seconds: 3), () {
+                                  Navigator.of(context).pop(false);
+                                  if (flagsignup == 1) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) =>
+                                          _buildPopupDialogsecc(context),
+                                    );
+                                    print(flagsignup);
+                                    Timer(const Duration(seconds: 2), () {
+                                      // Navigator.of(context).pop(false);
+                                      Navigator.of(context).pop(false);
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => Login()));
+                                    });
+                                  }
+                                  if (flagsignup == 6) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) =>
+                                          _buildPopupDialogserverout(context),
+                                    );
+                                    Timer(const Duration(seconds: 2), () {
+                                      Navigator.of(context).pop(false);
+                                    });
+                                  }
+                                  if (flagsignup == 0) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) =>
+                                          _buildPopupDialogincorrent(context),
+                                    );
+                                    // Timer(const Duration(seconds: 16), () {
+                                    //   // Navigator.of(context).pop(false);
+                                    // });
+                                  }
+                                });
+                              },
                               label: Text(
                                 'SIGNUP',
                                 textScaleFactor: 1.0,
@@ -94,4 +169,130 @@ class _SignupState extends State<Signup> {
                   ],
                 ))));
   }
+}
+
+void signup() async {
+  Dio dio = new Dio();
+  dio.options.headers['accept'] = 'application/json';
+  dio.options.headers['Content-Type'] = 'application/json';
+  try {
+    var response = await dio.post(
+      'https://k.qbox.dev/v1/user/',
+      data: {
+        "name": name,
+        "username": username,
+        "email": email,
+        "password": password
+      },
+      options: Options(
+        followRedirects: false,
+        validateStatus: (status) {
+          return status < 500;
+        },
+      ),
+    );
+    if (response.statusCode == 201) {
+      flagsignup = 1;
+      // print('---201---');
+      // print(response);
+    }
+    if (response.statusCode == 403) {
+      print('---403---');
+      // print(response);
+      // flagsignup = 6;
+    }
+    if (response.statusCode == 400) {
+      // print('---0000---');
+      // print(response);
+      flagsignup = 0;
+      error = Map<String, dynamic>.from(response.data);
+      // print(error.toString());
+      if (error['username'] != null) {
+        errorlist = error['username'];
+        // print(errorlist);
+      }
+      if (error['email'] != null) {
+        errorlist = error['email'];
+        // print(errorlist);
+      }
+      if (error['password'] != null) {
+        errorlist = error['password'];
+        // print(errorlist);
+      }
+    }
+
+    // ignore: unused_catch_clause
+  } on DioError catch (e) {}
+}
+
+Widget _buildPopupDialogsecc(BuildContext context) {
+  return BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+      child: AlertDialog(
+        backgroundColor: Color(0x01000000),
+        title: Center(
+            child: Text(
+          'SIGN UP SUCCESSFULLY',
+          textScaleFactor: 1.0,
+          style: TextStyle(
+              fontSize: 18.0,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              fontFamily: 'Segoe UI'),
+        )),
+      ));
+}
+
+Widget _buildPopupDialogserverout(BuildContext context) {
+  return BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+      child: AlertDialog(
+        backgroundColor: Color(0x01000000),
+        title: Center(
+            child: Text(
+          'server error',
+          textScaleFactor: 1.0,
+          style: TextStyle(
+              fontSize: 18.0,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              fontFamily: 'Segoe UI'),
+        )),
+      ));
+}
+
+Widget _buildPopupDialogincorrent(BuildContext context) {
+  return BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+      child: AlertDialog(
+        backgroundColor: Color(0x01000000),
+        title: Center(
+            child: Text(
+          errorlist.toString(),
+          textScaleFactor: 1.0,
+          style: TextStyle(
+              fontSize: 16.0,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              fontFamily: 'Segoe UI'),
+        )),
+      ));
+}
+
+Widget _buildPopupDialogloading(BuildContext context) {
+  return BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+      child: AlertDialog(
+          backgroundColor: Color(0x01000000),
+          title: Center(
+            child: Text(
+              'Loading ...',
+              textScaleFactor: 1.0,
+              style: TextStyle(
+                  fontSize: 35.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontFamily: 'Segoe UI'),
+            ),
+          )));
 }

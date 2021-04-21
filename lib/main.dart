@@ -1,4 +1,6 @@
+import 'package:doodle_ir/start.dart';
 import 'package:flutter/material.dart';
+// ignore: unused_import
 import 'dashboard.dart';
 
 void main() {
@@ -10,7 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'DooDle',
-      home: Home(),
+      home: Start(),
     );
   }
 }

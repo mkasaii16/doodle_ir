@@ -1,0 +1,53 @@
+[
+  {
+    "id": "c39acd55-a47f-45b8-8c9a-4dc9726c75ff",
+    "owner": {
+      "id": "9f2a28aa-f7cb-4447-b790-7240fda69e48",
+      "first_name": "",
+      "last_name": "",
+      "username": "mehdy",
+      "email": "mehdy.khoshnoody@gmail.com"
+    },
+    "options": [],
+    "created_at": "2021-04-19T20:28:30.306947Z",
+    "updated_at": "2021-04-19T20:28:30.306975Z",
+    "title": "Some event",
+    "description": "An optional description",
+    "timezone": "Asia/Tehran",
+    "optional": false
+  },
+  {
+    "id": "195093ae-637c-4c13-9cfe-7e709e70b15b",
+    "owner": {
+      "id": "9f2a28aa-f7cb-4447-b790-7240fda69e48",
+      "first_name": "",
+      "last_name": "",
+      "username": "mehdy",
+      "email": "mehdy.khoshnoody@gmail.com"
+    },
+    "options": [],
+    "created_at": "2021-04-19T20:28:56.587568Z",
+    "updated_at": "2021-04-19T20:28:56.587606Z",
+    "title": "Some event",
+    "description": "An optional description",
+    "timezone": "Asia/Tehran",
+    "optional": false
+  },
+  {
+    "id": "b811cb08-1fcc-45f7-ac38-78e1c0bfd681",
+    "owner": {
+      "id": "9f2a28aa-f7cb-4447-b790-7240fda69e48",
+      "first_name": "",
+      "last_name": "",
+      "username": "mehdy",
+      "email": "mehdy.khoshnoody@gmail.com"
+    },
+    "options": [],
+    "created_at": "2021-04-20T14:20:49.395545Z",
+    "updated_at": "2021-04-20T14:20:49.395578Z",
+    "title": "test eventt",
+    "description": "for test",
+    "timezone": "Asia/Tehran",
+    "optional": false
+  }
+]
