@@ -38,7 +38,7 @@ class Start extends StatelessWidget {
                           style: new TextStyle(
                               fontSize: 32.0,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: Colors.red,
                               fontFamily: 'Segoe UI'),
                         ),
                       ),

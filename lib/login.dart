@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:doodle_ir/dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
+import 'database.dart';
 import 'signup.dart';
 import 'forgetpassword.dart';
 import 'dashboard.dart';
@@ -84,26 +85,32 @@ class _LoginState extends State<Login> {
                             ElevatedButton.icon(
                               onPressed: () {
                                 showDialog(
+                                  // barrierDismissible: false,
                                   context: context,
                                   builder: (BuildContext context) =>
                                       _buildPopupDialogloading(context),
                                 );
+
                                 login();
-                                Timer(const Duration(seconds: 4), () {
+                                Timer(const Duration(seconds: 2), () {
+                                  Navigator.of(context).pop(false);
+                                  Navigator.of(context).pop(false);
                                   if (flag == 1) {
-                                    Navigator.of(context).pop(false);
+                                    _insertuser();
+                                    _insertpass();
+
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) => Home()));
                                   } else {
                                     showDialog(
+                                      // barrierDismissible: false,
                                       context: context,
                                       builder: (BuildContext context) =>
                                           _buildPopupDialogincorrent(context),
                                     );
-                                    Timer(const Duration(seconds: 3), () {
-                                      Navigator.of(context).pop(false);
+                                    Timer(const Duration(seconds: 2), () {
                                       Navigator.of(context).pop(false);
                                     });
                                   }
@@ -181,7 +188,7 @@ class _LoginState extends State<Login> {
   }
 }
 
-void login() async {
+Future login() async {
   Dio dio = new Dio();
   dio.options.headers['content-Type'] = 'application/json';
   try {
@@ -208,7 +215,7 @@ void login() async {
   }
 }
 
-void info() async {
+Future info() async {
   Dio dio = new Dio();
   dio.options.headers['accept'] = 'application/json';
   dio.options.headers["Authorization"] = "Bearer ${key['access']}";
@@ -254,4 +261,22 @@ Widget _buildPopupDialogloading(BuildContext context) {
                   fontFamily: 'Segoe UI'),
             ),
           )));
+}
+
+_insertuser() async {
+  //insert data in database
+  Word word = Word();
+  word.word = emaillogin;
+  word.frequency = 15;
+  DatabaseHelper helper = DatabaseHelper.instance;
+  await helper.insert(word);
+}
+
+_insertpass() async {
+  //insert data in database
+  Word word = Word();
+  word.word = passwordlogin;
+  word.frequency = 15;
+  DatabaseHelper helper = DatabaseHelper.instance;
+  await helper.insert(word);
 }

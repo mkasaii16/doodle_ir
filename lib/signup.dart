@@ -99,20 +99,21 @@ class _SignupState extends State<Signup> {
                             ElevatedButton.icon(
                               onPressed: () {
                                 showDialog(
+                                  barrierDismissible: false,
                                   context: context,
                                   builder: (BuildContext context) =>
                                       _buildPopupDialogloading(context),
                                 );
                                 signup();
-                                Timer(const Duration(seconds: 3), () {
+                                Timer(const Duration(seconds: 2), () {
                                   Navigator.of(context).pop(false);
                                   if (flagsignup == 1) {
                                     showDialog(
+                                      barrierDismissible: false,
                                       context: context,
                                       builder: (BuildContext context) =>
                                           _buildPopupDialogsecc(context),
                                     );
-                                    print(flagsignup);
                                     Timer(const Duration(seconds: 2), () {
                                       // Navigator.of(context).pop(false);
                                       Navigator.of(context).pop(false);
@@ -121,26 +122,16 @@ class _SignupState extends State<Signup> {
                                           MaterialPageRoute(
                                               builder: (context) => Login()));
                                     });
-                                  }
-                                  if (flagsignup == 6) {
+                                  } else {
                                     showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) =>
-                                          _buildPopupDialogserverout(context),
-                                    );
-                                    Timer(const Duration(seconds: 2), () {
-                                      Navigator.of(context).pop(false);
-                                    });
-                                  }
-                                  if (flagsignup == 0) {
-                                    showDialog(
+                                      barrierDismissible: false,
                                       context: context,
                                       builder: (BuildContext context) =>
                                           _buildPopupDialogincorrent(context),
                                     );
-                                    // Timer(const Duration(seconds: 16), () {
-                                    //   // Navigator.of(context).pop(false);
-                                    // });
+                                    Timer(const Duration(seconds: 2), () {
+                                      Navigator.of(context).pop(false);
+                                    });
                                   }
                                 });
                               },
@@ -171,7 +162,7 @@ class _SignupState extends State<Signup> {
   }
 }
 
-void signup() async {
+Future signup() async {
   Dio dio = new Dio();
   dio.options.headers['accept'] = 'application/json';
   dio.options.headers['Content-Type'] = 'application/json';
@@ -193,32 +184,8 @@ void signup() async {
     );
     if (response.statusCode == 201) {
       flagsignup = 1;
-      // print('---201---');
-      // print(response);
-    }
-    if (response.statusCode == 403) {
-      print('---403---');
-      // print(response);
-      // flagsignup = 6;
-    }
-    if (response.statusCode == 400) {
-      // print('---0000---');
-      // print(response);
+    } else {
       flagsignup = 0;
-      error = Map<String, dynamic>.from(response.data);
-      // print(error.toString());
-      if (error['username'] != null) {
-        errorlist = error['username'];
-        // print(errorlist);
-      }
-      if (error['email'] != null) {
-        errorlist = error['email'];
-        // print(errorlist);
-      }
-      if (error['password'] != null) {
-        errorlist = error['password'];
-        // print(errorlist);
-      }
     }
 
     // ignore: unused_catch_clause
@@ -233,24 +200,6 @@ Widget _buildPopupDialogsecc(BuildContext context) {
         title: Center(
             child: Text(
           'SIGN UP SUCCESSFULLY',
-          textScaleFactor: 1.0,
-          style: TextStyle(
-              fontSize: 18.0,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-              fontFamily: 'Segoe UI'),
-        )),
-      ));
-}
-
-Widget _buildPopupDialogserverout(BuildContext context) {
-  return BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-      child: AlertDialog(
-        backgroundColor: Color(0x01000000),
-        title: Center(
-            child: Text(
-          'server error',
           textScaleFactor: 1.0,
           style: TextStyle(
               fontSize: 18.0,

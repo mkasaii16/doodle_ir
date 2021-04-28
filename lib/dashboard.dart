@@ -3,11 +3,13 @@ import 'dart:async';
 // ignore: unused_import
 import 'dart:convert';
 import 'dart:ui';
+import 'package:doodle_ir/addoption.dart';
 import 'package:doodle_ir/byplan.dart';
-// ignore: unused_import
-import 'package:doodle_ir/signup.dart';
-import 'package:doodle_ir/start.dart';
+import 'package:doodle_ir/edit.dart';
+import 'package:doodle_ir/event.dart';
 
+import 'database.dart';
+import 'event.dart';
 import 'login.dart';
 import 'package:scaled_list/scaled_list.dart';
 import 'package:dio/dio.dart';
@@ -15,6 +17,8 @@ import 'package:flutter/material.dart';
 import 'package:animated_drawer/views/animated_drawer.dart';
 import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:loading_indicator/loading_indicator.dart';
+
+import 'main.dart';
 
 Map listevent, data, dataget;
 List events;
@@ -81,7 +85,11 @@ class _HomeState extends State<Home> {
                 padding: EdgeInsets.only(bottom: 30),
               ),
               TextButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  _delete();
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => MyApp()));
+                },
                 label: Text(
                   'LOG OUT       ',
                   textScaleFactor: 1.0,
@@ -194,7 +202,7 @@ class _HomeState extends State<Home> {
               child: Column(children: [
                 Text(''),
                 Text(
-                  'WELCOME ${data['username']}, enjoy...',
+                  'WELCOME ${data['username']},enjoy...',
                   textAlign: TextAlign.center,
                   textScaleFactor: 1.0,
                   style: new TextStyle(
@@ -221,32 +229,42 @@ class _HomeState extends State<Home> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Container(
+                                padding: EdgeInsets.only(right: 9, left: 9),
                                 alignment: Alignment.topLeft,
-                                height: selectedIndex == index ? 80 : 80,
+                                height: 80,
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.vertical,
                                   child: SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: MaterialButton(
-                                      onPressed: () {
-                                        print('.moein');
-                                      },
-                                      child: Text(
-                                        events[selectedIndex]['title'],
-                                        textScaleFactor: 1.0,
-                                        style: new TextStyle(
-                                            fontSize: 30.0,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black,
-                                            fontFamily: 'Segoe UI'),
-                                      ),
-                                    ),
-                                  ),
+                                      scrollDirection: Axis.horizontal,
+                                      child: Row(children: [
+                                        Icon(Icons.donut_large_outlined),
+                                        MaterialButton(
+                                          onPressed: () {
+                                            indexnum = selectedIndex;
+
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        Event()));
+                                          },
+                                          child: Text(
+                                            events[selectedIndex]['title'],
+                                            textScaleFactor: 1.0,
+                                            style: new TextStyle(
+                                                fontSize: 30.0,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black,
+                                                fontFamily: 'Segoe UI'),
+                                          ),
+                                        ),
+                                      ])),
                                 ),
                               ),
                               Container(
+                                padding: EdgeInsets.only(right: 9, left: 9),
                                 alignment: Alignment.center,
-                                height: selectedIndex == index ? 80 : 80,
+                                height: 80,
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.vertical,
                                   child: SingleChildScrollView(
@@ -264,7 +282,7 @@ class _HomeState extends State<Home> {
                                 ),
                               ),
                               Container(
-                                padding: EdgeInsets.only(right: 9),
+                                padding: EdgeInsets.only(right: 9, left: 9),
                                 alignment: Alignment.bottomRight,
                                 height: selectedIndex == index ? 80 : 80,
                                 child: SingleChildScrollView(
@@ -295,6 +313,7 @@ class _HomeState extends State<Home> {
                                           MaterialButton(
                                               onPressed: () {
                                                 showDialog(
+                                                  barrierDismissible: false,
                                                   context: context,
                                                   builder: (BuildContext
                                                           context) =>
@@ -310,6 +329,7 @@ class _HomeState extends State<Home> {
                                                       .pop(false);
                                                   if (flagdelete == 1) {
                                                     showDialog(
+                                                      barrierDismissible: false,
                                                       context: context,
                                                       builder: (BuildContext
                                                               context) =>
@@ -321,6 +341,8 @@ class _HomeState extends State<Home> {
                                                             seconds: 2), () {
                                                       Navigator.of(context)
                                                           .pop(false);
+
+                                                      setState(() {});
                                                       Navigator.push(
                                                           context,
                                                           MaterialPageRoute(
@@ -330,6 +352,7 @@ class _HomeState extends State<Home> {
                                                     });
                                                   } else {
                                                     showDialog(
+                                                      barrierDismissible: false,
                                                       context: context,
                                                       builder: (BuildContext
                                                               context) =>
@@ -338,7 +361,7 @@ class _HomeState extends State<Home> {
                                                     );
                                                     Timer(
                                                         const Duration(
-                                                            seconds: 3), () {
+                                                            seconds: 2), () {
                                                       Navigator.of(context)
                                                           .pop(false);
                                                     });
@@ -348,14 +371,25 @@ class _HomeState extends State<Home> {
                                               child: Icon(Icons.delete)),
                                           MaterialButton(
                                               onPressed: () {
-                                                print('2.moein');
+                                                indexnum = selectedIndex;
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            Editevent()));
                                               },
-                                              child: Icon(Icons.update)),
+                                              child: Icon(Icons.edit)),
                                           MaterialButton(
                                               onPressed: () {
-                                                print('3.moein');
+                                                indexnum = selectedIndex;
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            Addoption()));
                                               },
-                                              child: Icon(Icons.edit))
+                                              child:
+                                                  Icon(Icons.how_to_vote_sharp))
                                         ],
                                       )),
                                 ),
@@ -379,46 +413,44 @@ class _HomeState extends State<Home> {
                   },
                 ),
                 Text(''),
-                Text(
-                  '     ${data['username']} make new  with float button',
-                  textAlign: TextAlign.left,
-                  textScaleFactor: 1.0,
-                  style: new TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xff71A5D7),
-                      fontFamily: 'Segoe UI'),
-                ),
+                Container(
+                  width: 460,
+                  height: 150,
+                  child: Text(
+                    '     ${data['username']} make new doodle with float button',
+                    textAlign: TextAlign.left,
+                    textScaleFactor: 1.0,
+                    style: new TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xff71A5D7),
+                        fontFamily: 'Segoe UI'),
+                  ),
+                )
               ]),
             )),
           ),
           floatingActionButton: FabCircularMenu(
-              ringColor: Colors.grey[500],
-              fabOpenColor: Colors.grey[200],
-              fabCloseColor: Colors.grey[500],
+              ringColor: Colors.blue[500],
+              fabOpenColor: Colors.blue[200],
+              fabCloseColor: Colors.blue[500],
               ringDiameter: 300,
               ringWidth: 60,
               children: <Widget>[
                 IconButton(
                     //by plan
                     icon: Icon(Icons.fact_check_outlined),
-                    onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => ByPlan()));
-                    }),
+                    onPressed: () {}),
                 IconButton(
                     //by date
                     icon: Icon(Icons.date_range_outlined),
-                    onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => Start()));
-                    }),
+                    onPressed: () {}),
                 IconButton(
                     //by time
                     icon: Icon(Icons.timer),
                     onPressed: () {
                       Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => Start()));
+                          MaterialPageRoute(builder: (context) => ByPlan()));
                     }),
               ])),
     );
@@ -444,9 +476,6 @@ Future getlist() async {
   events = (response.data);
   if (response.statusCode == 200) {
     return events;
-  } else {
-    throw Exception(
-        'متاسفانه اطلاعات این شهر رو نداریم شاید انگلیسی جستجو کنید');
   }
 }
 
@@ -535,4 +564,13 @@ Widget _buildPopupDialogsecc(BuildContext context) {
               fontFamily: 'Segoe UI'),
         )),
       ));
+}
+
+Future _delete() async {
+  final helper = DatabaseHelper.instance;
+
+  int id = await helper.getCount();
+  for (var i = 1; i <= id; i++) {
+    await helper.deleteWord(i);
+  }
 }

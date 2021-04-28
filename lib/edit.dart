@@ -7,15 +7,18 @@ import 'package:flutter/material.dart';
 import 'dashboard.dart';
 import 'login.dart';
 
-String title, location, note;
-int flagnewevent;
+String titleedit, locationedit, noteedit;
+int flageditevent;
 
-class ByPlan extends StatefulWidget {
+class Editevent extends StatefulWidget {
   @override
-  _ByPlanState createState() => _ByPlanState();
+  _EditeventState createState() => _EditeventState();
 }
 
-class _ByPlanState extends State<ByPlan> {
+class _EditeventState extends State<Editevent> {
+  TextEditingController _controllertitle = new TextEditingController();
+  TextEditingController _controllerlocation = new TextEditingController();
+  TextEditingController _controllernote = new TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,16 +26,18 @@ class _ByPlanState extends State<ByPlan> {
       child: Column(
         children: [
           Container(
-              height: 160,
-              color: Colors.blue[300],
+              height: 260,
+              color: Colors.green[200],
               child: Row(
                 children: [
                   Spacer(),
                   Container(
                     width: 250,
                     child: TextField(
+                        controller: _controllertitle
+                          ..text = events[indexnum]['title'],
                         onChanged: (text) {
-                          title = text;
+                          titleedit = text;
                         },
                         decoration: InputDecoration(
                           labelText: 'Title',
@@ -42,19 +47,22 @@ class _ByPlanState extends State<ByPlan> {
                   Spacer(),
                   ElevatedButton.icon(
                       onPressed: () {
-                        if (title != '') {
-                          if (location != '') {
-                            if (note != '') {
+                        titleedit = _controllertitle.text;
+                        locationedit = _controllerlocation.text;
+                        noteedit = _controllernote.text;
+                        if (titleedit != '') {
+                          if (locationedit != '') {
+                            if (noteedit != '') {
                               showDialog(
                                 barrierDismissible: false,
                                 context: context,
                                 builder: (BuildContext context) =>
                                     _buildPopupDialogloading(context),
                               );
-                              createnewevent();
+                              editevent();
                               Timer(const Duration(seconds: 2), () {
                                 Navigator.of(context).pop(false);
-                                if (flagnewevent == 1) {
+                                if (flageditevent == 1) {
                                   showDialog(
                                     barrierDismissible: false,
                                     context: context,
@@ -115,7 +123,7 @@ class _ByPlanState extends State<ByPlan> {
                         } //title
                       },
                       label: Text(
-                        'Create',
+                        'Edit',
                         textScaleFactor: 1.0,
                         style: new TextStyle(
                             fontSize: 14.0,
@@ -127,7 +135,6 @@ class _ByPlanState extends State<ByPlan> {
                   Spacer()
                 ],
               )),
-          Spacer(),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -139,8 +146,10 @@ class _ByPlanState extends State<ByPlan> {
               Container(
                 width: 300,
                 child: TextField(
+                    controller: _controllerlocation
+                      ..text = events[indexnum]['timezone'],
                     onChanged: (text) {
-                      location = text;
+                      locationedit = text;
                     },
                     decoration: InputDecoration(
                       labelText: 'LOCATION',
@@ -165,8 +174,10 @@ class _ByPlanState extends State<ByPlan> {
               Container(
                 width: 300,
                 child: TextField(
+                    controller: _controllernote
+                      ..text = events[indexnum]['description'],
                     onChanged: (text) {
-                      note = text;
+                      noteedit = text;
                     },
                     decoration: InputDecoration(
                       labelText: 'Note',
@@ -180,16 +191,31 @@ class _ByPlanState extends State<ByPlan> {
             color: Colors.grey[200],
             thickness: 1,
           ),
-          Spacer(
-            flex: 8,
-          )
+          // Row(
+          //   crossAxisAlignment: CrossAxisAlignment.start,
+          //   children: [
+          //     Icon(Icons.settings),
+          //     MaterialButton(
+          //       onPressed: () {}, //settings
+          //       child: Text(
+          //         'Settings',
+          //         textScaleFactor: 1.0,
+          //         style: new TextStyle(
+          //             fontSize: 11.0,
+          //             fontWeight: FontWeight.bold,
+          //             color: Colors.black,
+          //             fontFamily: 'Segoe UI'),
+          //       ),
+          //     ),
+          //   ],
+          // ),
         ],
       ),
     ));
   }
 }
 
-Future createnewevent() async {
+Future editevent() async {
   Dio dio = new Dio();
   dio.options.headers['accept'] = 'application/json';
   var token = await dio.post(
@@ -205,12 +231,12 @@ Future createnewevent() async {
   key = Map<String, dynamic>.from(token.data);
   dio.options.headers["Authorization"] = "Bearer ${key['access']}";
   // ignore: unused_local_variable
-  var newevent = await dio.post(
-    "https://k.qbox.dev/v1/event/",
+  var newevent = await dio.put(
+    "https://k.qbox.dev/v1/event/${events[indexnum]['id']}/",
     data: {
-      "title": title,
-      "description": note,
-      "timezone": location,
+      "title": titleedit,
+      "description": noteedit,
+      "timezone": locationedit,
       "optional_enabled": false
     },
     options: Options(
@@ -220,18 +246,19 @@ Future createnewevent() async {
       },
     ),
   );
-  if (newevent.statusCode == 201) {
-    title = '';
-    location = '';
-    note = '';
-    flagnewevent = 1;
+  if (newevent.statusCode == 200) {
+    titleedit = '';
+    locationedit = '';
+    noteedit = '';
+
+    flageditevent = 1;
   } else {
-    flagnewevent = 0;
+    flageditevent = 0;
   }
 }
 
 // ignore: unused_element
-Widget _dialogoption(BuildContext context) {
+Widget _dialognote(BuildContext context) {
   return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 16, sigmaY: 56),
       child: AlertDialog(
@@ -245,7 +272,7 @@ Widget _dialogoption(BuildContext context) {
                       width: 250,
                       child: TextField(
                           onChanged: (text) {
-                            note = text;
+                            noteedit = text;
                           },
                           decoration: InputDecoration(
                             labelText: 'note',
